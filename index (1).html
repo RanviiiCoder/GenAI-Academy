@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GenAI Academy — Master Generative AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Cabinet+Grotesk:wght@300;400;500;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08080f;--bg2:#0f0f1a;--bg3:#16162a;--bg4:#1c1c32;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#eeeef8;--muted:#7777a0;--subtle:#4a4a70;
+  --accent:#6c63ff;--accent-hover:#5a52e0;
+  --teal:#2dd4bf;--teal-dim:rgba(45,212,191,0.12);
+  --gold:#f59e0b;--rose:#f43f5e;
+  --success:#22c55e;--danger:#ef4444;
+  --radius:16px;--radius-sm:10px;--radius-xs:6px;
+  --font-display:'Clash Display',sans-serif;
+  --font-body:'Cabinet Grotesk',sans-serif;
+  --shadow:0 20px 60px rgba(0,0,0,0.5);
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:16px;line-height:1.6}
+h1,h2,h3,h4,h5{font-family:var(--font-display);letter-spacing:-0.02em}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;font-family:var(--font-body);transition:all .2s}
+input,textarea,select{font-family:var(--font-body)}
+img{max-width:100%}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+
+/* ─── UTILITIES ─── */
+.hidden{display:none!important}
+.flex{display:flex}
+.items-center{align-items:center}
+.justify-between{justify-content:space-between}
+.gap-2{gap:.5rem}.gap-3{gap:.75rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}
+.w-full{width:100%}
+.text-muted{color:var(--muted)}
+.text-sm{font-size:.875rem}
+.text-xs{font-size:.75rem}
+.font-bold{font-weight:700}
+.mt-1{margin-top:.25rem}.mt-2{margin-top:.5rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}
+.mb-2{margin-bottom:.5rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}
+.grid{display:grid}
+
+/* ─── BUTTONS ─── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.65rem 1.4rem;border-radius:100px;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;letter-spacing:.01em}
+.btn-primary{background:var(--accent);color:#fff;border:none}
+.btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 8px 30px rgba(108,99,255,.35)}
+.btn-teal{background:var(--teal);color:#022c27;border:none;font-weight:800}
+.btn-teal:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 8px 30px rgba(45,212,191,.3)}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border2)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid transparent}
+.btn-ghost:hover{color:var(--text);background:rgba(255,255,255,.05)}
+.btn-danger{background:rgba(239,68,68,.12);color:var(--danger);border:1px solid rgba(239,68,68,.2)}
+.btn-danger:hover{background:rgba(239,68,68,.2)}
+.btn-lg{padding:.85rem 2rem;font-size:1rem}
+.btn-sm{padding:.4rem 1rem;font-size:.8rem}
+.btn-full{width:100%;justify-content:center}
+.btn:disabled{opacity:.5;pointer-events:none}
+
+/* ─── SPINNER ─── */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ─── TOAST ─── */
+.toast-container{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem;pointer-events:none}
+.toast{padding:.85rem 1.25rem;border-radius:var(--radius-sm);font-size:.875rem;font-weight:500;transform:translateX(120%);opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1);border:1px solid;max-width:320px;pointer-events:auto}
+.toast.show{transform:translateX(0);opacity:1}
+.toast-success{background:#0a2e1a;border-color:rgba(34,197,94,.25);color:#4ade80}
+.toast-error{background:#2e0a0a;border-color:rgba(239,68,68,.25);color:#f87171}
+.toast-info{background:var(--bg3);border-color:var(--border2);color:var(--text)}
+
+/* ─── NAV ─── */
+#mainNav{position:fixed;top:0;left:0;right:0;z-index:500;height:64px;display:flex;align-items:center;padding:0 2rem;background:rgba(8,8,15,.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:var(--font-display);font-size:1.25rem;font-weight:700;background:linear-gradient(90deg,#a78bfa,var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;cursor:pointer}
+.nav-center{display:flex;gap:2rem;align-items:center}
+.nav-link{font-size:.875rem;font-weight:500;color:var(--muted);transition:color .2s;cursor:pointer}
+.nav-link:hover{color:var(--text)}
+.nav-right{display:flex;gap:.75rem;align-items:center;margin-left:auto}
+
+/* ─── VIEWS ─── */
+.view{display:none;padding-top:64px;min-height:100vh}
+.view.active{display:block}
+
+/* ═══════════════════════════
+   LANDING PAGE
+═══════════════════════════ */
+/* HERO */
+.hero{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:7rem 2rem 5rem;overflow:hidden;min-height:92vh}
+.hero-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);width:900px;height:700px;background:radial-gradient(ellipse at center,rgba(108,99,255,.15) 0%,rgba(45,212,191,.06) 40%,transparent 70%);pointer-events:none;z-index:0}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;mask-image:radial-gradient(ellipse at center,black 30%,transparent 70%)}
+.hero-content{position:relative;z-index:1;max-width:780px}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;padding:.4rem 1rem;border-radius:100px;border:1px solid rgba(108,99,255,.3);background:rgba(108,99,255,.08);font-size:.8rem;font-weight:600;color:#a78bfa;margin-bottom:2rem;letter-spacing:.04em}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.hero h1{font-size:clamp(3rem,7vw,5.5rem);font-weight:700;line-height:1.04;margin-bottom:1.5rem}
+.hero h1 .grad{background:linear-gradient(135deg,#a78bfa 0%,var(--teal) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:1.15rem;color:var(--muted);max-width:560px;margin:0 auto 2.5rem;font-weight:400}
+.hero-ctas{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
+.hero-social-proof{margin-top:4rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;justify-content:center}
+.avatars{display:flex}
+.avatar-sm{width:32px;height:32px;border-radius:50%;border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;margin-left:-8px}
+.avatar-sm:first-child{margin-left:0}
+.proof-text{font-size:.875rem;color:var(--muted)}<br>
+.proof-text strong{color:var(--text)}
+.stars{color:var(--gold);font-size:.875rem}
+
+/* STATS BAR */
+.stats-bar{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:2.5rem 2rem}
+.stats-inner{display:flex;justify-content:center;gap:4rem;flex-wrap:wrap;max-width:900px;margin:0 auto}
+.stat{text-align:center}
+.stat-num{font-family:var(--font-display);font-size:2.5rem;font-weight:700;line-height:1}
+.stat-num.c-purple{background:linear-gradient(135deg,#a78bfa,#6c63ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-num.c-teal{color:var(--teal)}
+.stat-num.c-gold{color:var(--gold)}
+.stat-num.c-rose{color:var(--rose)}
+.stat-label{font-size:.8rem;color:var(--muted);margin-top:.35rem;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+
+/* COURSES SECTION */
+.section{padding:6rem 2rem;max-width:1200px;margin:0 auto}
+.section-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:1rem}
+.section-title{font-size:clamp(2rem,4vw,3rem);font-weight:700;margin-bottom:1rem}
+.section-desc{color:var(--muted);max-width:540px;font-size:1rem}
+.section-head{margin-bottom:3.5rem}
+
+.courses-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem}
+.course-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .3s;display:flex;flex-direction:column}
+.course-card:hover{border-color:var(--border2);transform:translateY(-5px);box-shadow:var(--shadow)}
+.course-thumb{height:190px;display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative;flex-shrink:0}
+.ct-1{background:linear-gradient(135deg,#1a0a3e,#3d1a8a)}
+.ct-2{background:linear-gradient(135deg,#042e28,#095c4e)}
+.ct-3{background:linear-gradient(135deg,#2e1a06,#6b3c0d)}
+.ct-4{background:linear-gradient(135deg,#2e0618,#7a1038)}
+.ct-5{background:linear-gradient(135deg,#061b2e,#0e4070)}
+.ct-6{background:linear-gradient(135deg,#0f2e06,#266b0d)}
+.course-badge{position:absolute;top:12px;left:12px;padding:.25rem .7rem;border-radius:100px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.badge-free{background:rgba(45,212,191,.15);color:var(--teal);border:1px solid rgba(45,212,191,.25)}
+.badge-beginner{background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.2)}
+.badge-intermediate{background:rgba(245,158,11,.12);color:var(--gold);border:1px solid rgba(245,158,11,.2)}
+.badge-advanced{background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.2)}
+.course-body{padding:1.25rem;display:flex;flex-direction:column;flex:1}
+.course-title{font-family:var(--font-display);font-size:1.05rem;font-weight:600;margin-bottom:.5rem;line-height:1.3}
+.course-desc{font-size:.85rem;color:var(--muted);line-height:1.6;flex:1;margin-bottom:1rem}
+.course-footer{display:flex;align-items:center;justify-content:space-between;padding-top:.75rem;border-top:1px solid var(--border)}
+.course-meta-info{font-size:.78rem;color:var(--subtle);font-weight:500}
+.course-price{font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:#a78bfa}
+.course-price.is-free{color:var(--teal)}
+
+/* FEATURES / HOW IT WORKS */
+.features-bg{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem}
+.feat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;transition:border-color .2s}
+.feat-card:hover{border-color:var(--border2)}
+.feat-icon{width:48px;height:48px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1rem}
+.feat-title{font-family:var(--font-display);font-size:1.05rem;font-weight:600;margin-bottom:.5rem}
+.feat-desc{font-size:.875rem;color:var(--muted);line-height:1.6}
+
+/* PRICING */
+.pricing-wrap{background:var(--bg)}
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;max-width:1000px;margin:0 auto}
+.plan-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;position:relative;transition:all .3s}
+.plan-card:hover{border-color:var(--border2)}
+.plan-card.popular{border-color:rgba(108,99,255,.5);background:linear-gradient(160deg,rgba(108,99,255,.07),rgba(45,212,191,.03))}
+.plan-pop-badge{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:.7rem;font-weight:800;padding:.3rem 1.2rem;border-radius:0 0 10px 10px;letter-spacing:.06em;text-transform:uppercase}
+.plan-name{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem}
+.plan-price-val{font-family:var(--font-display);font-size:3rem;font-weight:700;line-height:1;margin-bottom:.25rem}
+.plan-price-period{font-size:.875rem;color:var(--muted);margin-bottom:1.25rem}
+.plan-desc{font-size:.875rem;color:var(--muted);margin-bottom:1.5rem;min-height:48px;line-height:1.5}
+.plan-features{list-style:none;margin-bottom:2rem}
+.plan-features li{display:flex;align-items:flex-start;gap:.6rem;font-size:.875rem;padding:.5rem 0;border-bottom:1px solid var(--border);color:var(--muted)}
+.plan-features li:last-child{border:none}
+.plan-features li.yes{color:var(--text)}
+.check-icon{width:18px;height:18px;flex-shrink:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;margin-top:2px}
+.check-icon.ok{background:rgba(45,212,191,.15);color:var(--teal)}
+.check-icon.no{background:rgba(255,255,255,.05);color:var(--subtle)}
+
+/* TESTIMONIALS */
+.testimonials-wrap{background:var(--bg2);border-top:1px solid var(--border)}
+.testimonials-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem}
+.testi-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem}
+.testi-stars{color:var(--gold);font-size:.875rem;margin-bottom:.75rem}
+.testi-text{font-size:.9rem;color:var(--muted);line-height:1.7;margin-bottom:1rem;font-style:italic}
+.testi-author{display:flex;align-items:center;gap:.75rem}
+.testi-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.875rem;font-weight:700}
+.testi-name{font-size:.875rem;font-weight:600}
+.testi-role{font-size:.75rem;color:var(--muted)}
+
+/* FOOTER */
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2rem;text-align:center}
+.footer-logo{font-family:var(--font-display);font-size:1.35rem;font-weight:700;background:linear-gradient(90deg,#a78bfa,var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:1.5rem}
+.footer-links{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem}
+.footer-link{font-size:.875rem;color:var(--muted);cursor:pointer;transition:color .2s}
+.footer-link:hover{color:var(--text)}
+.footer-copy{font-size:.75rem;color:var(--subtle)}
+
+/* ═══════════════════════════
+   AUTH MODAL
+═══════════════════════════ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:800;display:none;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;width:100%;max-width:430px;padding:2.25rem;position:relative;animation:modalIn .3s ease}
+@keyframes modalIn{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal-close{position:absolute;top:1rem;right:1rem;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:var(--muted);cursor:pointer;border:none;transition:all .2s}
+.modal-close:hover{background:rgba(255,255,255,.12);color:var(--text)}
+.modal-title{font-size:1.6rem;font-weight:700;margin-bottom:.25rem}
+.modal-sub{font-size:.875rem;color:var(--muted);margin-bottom:1.75rem}
+.auth-tabs{display:flex;background:rgba(255,255,255,.05);border-radius:10px;padding:4px;gap:4px;margin-bottom:1.5rem}
+.auth-tab{flex:1;padding:.55rem;border-radius:7px;font-size:.875rem;font-weight:600;background:transparent;color:var(--muted);border:none;cursor:pointer;transition:all .2s}
+.auth-tab.active{background:var(--bg3);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.form-group{margin-bottom:1.1rem}
+.form-label{display:block;font-size:.8rem;font-weight:600;color:var(--muted);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.05em}
+.form-input{width:100%;padding:.7rem 1rem;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:.9rem;outline:none;transition:border-color .2s}
+.form-input:focus{border-color:var(--accent)}
+.form-input::placeholder{color:var(--subtle)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.form-err{font-size:.75rem;color:var(--danger);margin-top:.3rem}
+.divider{display:flex;align-items:center;gap:.75rem;margin:1.25rem 0;color:var(--subtle);font-size:.8rem}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.social-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;padding:.7rem;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:.875rem;font-weight:500;cursor:pointer;transition:all .2s;margin-bottom:.5rem}
+.social-btn:hover{background:rgba(255,255,255,.09)}
+.form-hint{font-size:.78rem;color:var(--muted);text-align:center;margin-top:.75rem}
+.form-hint a{color:var(--accent);cursor:pointer}
+
+/* ═══════════════════════════
+   PAYMENT MODAL
+═══════════════════════════ */
+.payment-modal .modal{max-width:480px}
+.pay-order{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.25rem;margin-bottom:1.5rem}
+.pay-row{display:flex;justify-content:space-between;align-items:center;font-size:.875rem;padding:.3rem 0}
+.pay-row.total{border-top:1px solid var(--border);margin-top:.75rem;padding-top:.75rem;font-weight:700;font-size:1rem}
+.pay-total-val{font-family:var(--font-display);font-size:1.35rem;color:#a78bfa}
+.card-wrap{position:relative}
+.card-brands{position:absolute;right:.85rem;top:50%;transform:translateY(-50%);display:flex;gap:.3rem}
+.card-brand{padding:.15rem .5rem;border-radius:3px;font-size:.6rem;font-weight:800}
+.cb-visa{background:#1a1f71;color:#fff}
+.cb-mc{background:#eb001b;color:#fff}
+.cb-rupay{background:#0d7a3e;color:#fff}
+.secure-note{display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:var(--subtle);margin-top:1rem}
+.lock-badge{width:16px;height:16px;background:var(--teal);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:.55rem;flex-shrink:0}
+.pay-success{text-align:center;padding:1.5rem 0}
+.pay-success-icon{width:72px;height:72px;border-radius:50%;border:2px solid var(--teal);background:rgba(45,212,191,.1);display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 1.25rem}
+.pay-success-title{font-size:1.5rem;font-weight:700;margin-bottom:.5rem}
+.pay-success-desc{color:var(--muted);font-size:.9rem;margin-bottom:1.5rem}
+
+/* ═══════════════════════════
+   DASHBOARD
+═══════════════════════════ */
+#dashView{padding-top:64px}
+.dash-layout{display:grid;grid-template-columns:250px 1fr;min-height:calc(100vh - 64px)}
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:1.5rem;display:flex;flex-direction:column;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto}
+.sidebar-user{padding-bottom:1.25rem;border-bottom:1px solid var(--border);margin-bottom:1.25rem;text-align:center}
+.user-avatar{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.35rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--teal));margin:0 auto .75rem;flex-shrink:0}
+.user-name{font-weight:700;font-size:1rem;margin-bottom:.2rem}
+.user-email{font-size:.78rem;color:var(--muted)}
+.user-plan-badge{display:inline-block;padding:.2rem .75rem;border-radius:100px;font-size:.7rem;font-weight:700;margin-top:.5rem;text-transform:uppercase;letter-spacing:.05em}
+.plan-free{background:rgba(255,255,255,.07);color:var(--muted)}
+.plan-pro{background:rgba(108,99,255,.2);color:#a78bfa;border:1px solid rgba(108,99,255,.3)}
+.plan-lifetime{background:rgba(245,158,11,.15);color:var(--gold);border:1px solid rgba(245,158,11,.25)}
+.sidebar-nav{list-style:none;flex:1}
+.sidebar-nav-item{display:flex;align-items:center;gap:.65rem;padding:.65rem .85rem;border-radius:var(--radius-sm);font-size:.9rem;font-weight:500;color:var(--muted);cursor:pointer;margin-bottom:.2rem;transition:all .2s}
+.sidebar-nav-item:hover{background:rgba(255,255,255,.05);color:var(--text)}
+.sidebar-nav-item.active{background:rgba(108,99,255,.12);color:#a78bfa}
+.sidebar-nav-item svg{width:18px;height:18px;flex-shrink:0}
+.sidebar-footer{padding-top:1rem;border-top:1px solid var(--border);margin-top:auto}
+.dash-main{padding:2rem;overflow-y:auto}
+.dash-section{display:none}
+.dash-section.active{display:block}
+.dash-section-title{font-size:1.5rem;font-weight:700;margin-bottom:.35rem}
+.dash-section-sub{font-size:.875rem;color:var(--muted);margin-bottom:2rem}
+
+/* Dashboard metrics */
+.metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem}
+.metric-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
+.metric-label{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.5rem;font-weight:600}
+.metric-val{font-family:var(--font-display);font-size:2.2rem;font-weight:700}
+.mv-purple{color:#a78bfa}
+.mv-teal{color:var(--teal)}
+.mv-gold{color:var(--gold)}
+
+/* Enrolled courses */
+.enrolled-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
+.enrolled-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;cursor:pointer;transition:all .25s}
+.enrolled-card:hover{border-color:var(--border2);transform:translateY(-3px)}
+.enrolled-thumb{font-size:2rem;width:48px;height:48px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;margin-bottom:.85rem}
+.enrolled-title{font-family:var(--font-display);font-size:.95rem;font-weight:600;margin-bottom:.35rem}
+.enrolled-meta{font-size:.78rem;color:var(--muted);margin-bottom:.85rem}
+.progress-bar{background:rgba(255,255,255,.08);border-radius:100px;height:5px;overflow:hidden;margin-bottom:.4rem}
+.progress-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent),var(--teal))}
+.progress-label{font-size:.75rem;color:var(--muted)}
+
+/* Billing page */
+.billing-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;max-width:580px;margin-bottom:1.5rem}
+.billing-plan-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem}
+.billing-plan-name{font-family:var(--font-display);font-size:1.5rem;font-weight:700}
+.billing-info{font-size:.875rem;color:var(--muted);line-height:1.6}
+.invoice-row{display:flex;justify-content:space-between;align-items:center;padding:.65rem 0;border-bottom:1px solid var(--border);font-size:.875rem}
+.invoice-row:last-child{border:none}
+.invoice-status{padding:.2rem .65rem;border-radius:100px;font-size:.7rem;font-weight:700}
+.status-paid{background:rgba(34,197,94,.12);color:#4ade80}
+
+/* Profile page */
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;max-width:640px}
+.profile-grid .full{grid-column:1/-1}
+.avatar-upload{display:flex;align-items:center;gap:1.25rem;margin-bottom:1.5rem}
+.avatar-upload-btn{padding:.5rem 1rem;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:100px;font-size:.8rem;font-weight:600;cursor:pointer;color:var(--muted);transition:all .2s}
+.avatar-upload-btn:hover{border-color:var(--accent);color:var(--text)}
+
+/* ═══════════════════════════
+   COURSE PLAYER
+═══════════════════════════ */
+#playerView{padding-top:64px}
+.player-layout{display:grid;grid-template-columns:340px 1fr;min-height:calc(100vh - 64px)}
+.player-sidebar{background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;position:sticky;top:64px;height:calc(100vh - 64px)}
+.player-sidebar-header{padding:1.25rem;border-bottom:1px solid var(--border)}
+.player-course-title{font-family:var(--font-display);font-size:1rem;font-weight:600;line-height:1.3;margin-bottom:.35rem}
+.player-progress-wrap{margin-top:.75rem}
+.player-progress-label{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:.35rem}
+.module-block{border-bottom:1px solid var(--border)}
+.module-header{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.25rem;cursor:pointer;transition:background .2s}
+.module-header:hover{background:rgba(255,255,255,.03)}
+.module-title{font-size:.85rem;font-weight:600}
+.module-count{font-size:.75rem;color:var(--muted)}
+.module-chevron{color:var(--muted);font-size:.75rem;transition:transform .25s}
+.module-block.open .module-chevron{transform:rotate(180deg)}
+.module-lessons{display:none}
+.module-block.open .module-lessons{display:block}
+.lesson-item{display:flex;align-items:center;gap:.65rem;padding:.65rem 1.25rem .65rem 1.5rem;cursor:pointer;transition:background .2s;font-size:.82rem;color:var(--muted);border-left:3px solid transparent}
+.lesson-item:hover{background:rgba(255,255,255,.03);color:var(--text)}
+.lesson-item.active{background:rgba(108,99,255,.1);color:#a78bfa;border-left-color:var(--accent)}
+.lesson-item.done{color:var(--teal)}
+.lesson-icon{width:20px;height:20px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:.65rem;flex-shrink:0}
+.lesson-item.done .lesson-icon{background:var(--teal-dim);border-color:var(--teal);color:var(--teal)}
+.lesson-item.active .lesson-icon{background:rgba(108,99,255,.15);border-color:var(--accent);color:var(--accent)}
+.lesson-duration{margin-left:auto;font-size:.72rem;color:var(--subtle)}
+.player-main{display:flex;flex-direction:column;overflow-y:auto}
+.video-area{background:#000;aspect-ratio:16/9;position:relative;display:flex;align-items:center;justify-content:center;max-height:60vh}
+.video-placeholder{text-align:center;color:var(--muted)}
+.video-placeholder-icon{font-size:4rem;margin-bottom:1rem;display:block}
+.play-btn{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;cursor:pointer;transition:all .2s;margin:1rem auto 0}
+.play-btn:hover{background:rgba(255,255,255,.18);transform:scale(1.06)}
+.player-content{padding:2rem;flex:1}
+.player-lesson-title{font-size:1.5rem;font-weight:700;margin-bottom:.5rem}
+.player-lesson-meta{font-size:.875rem;color:var(--muted);margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem}
+.player-desc{font-size:.95rem;color:var(--muted);line-height:1.8;margin-bottom:2rem;max-width:700px}
+.player-nav{display:flex;gap:.75rem;align-items:center}
+.resource-chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1.5rem}
+.resource-chip{padding:.35rem .85rem;border-radius:100px;background:rgba(255,255,255,.06);border:1px solid var(--border);font-size:.78rem;color:var(--muted);cursor:pointer;transition:all .2s}
+.resource-chip:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:900px){
+  .dash-layout,.player-layout{grid-template-columns:1fr}
+  .sidebar,.player-sidebar{display:none}
+  .metrics-row{grid-template-columns:1fr 1fr}
+  .hero h1{font-size:2.5rem}
+  .stats-inner{gap:2rem}
+  .pricing-grid{grid-template-columns:1fr}
+  .plan-card.popular{margin:0}
+  .profile-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .metrics-row{grid-template-columns:1fr}
+  .hero-ctas{flex-direction:column;align-items:center}
+  .nav-center{display:none}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ─── TOAST CONTAINER ─── -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ─── NAV ─── -->
+<nav id="mainNav">
+  <div class="nav-logo" onclick="goLanding()">GenAI Academy</div>
+  <div class="nav-center" id="navCenter">
+    <span class="nav-link" onclick="scrollToId('courses-section')">Courses</span>
+    <span class="nav-link" onclick="scrollToId('pricing-section')">Pricing</span>
+    <span class="nav-link" onclick="scrollToId('about-section')">About</span>
+  </div>
+  <div class="nav-right" id="navRight">
+    <button class="btn btn-ghost btn-sm" onclick="openAuth('login')">Sign in</button>
+    <button class="btn btn-primary btn-sm" onclick="openAuth('signup')">Get started free</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════
+     LANDING VIEW
+═══════════════════════════════════ -->
+<div id="landingView" class="view active">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+      <div class="hero-badge"><span class="hero-badge-dot"></span>SPRING 2025 COHORT — NOW OPEN</div>
+      <h1>Master <span class="grad">Generative AI</span><br/>from the ground up</h1>
+      <p class="hero-sub">Hands-on courses built by AI researchers and engineers. From curious beginner to confident builder — at your own pace, with real projects.</p>
+      <div class="hero-ctas">
+        <button class="btn btn-primary btn-lg" onclick="openAuth('signup')">Start for free →</button>
+        <button class="btn btn-outline btn-lg" onclick="scrollToId('courses-section')">Browse courses</button>
+      </div>
+      <div class="hero-social-proof">
+        <div class="avatars">
+          <div class="avatar-sm" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">A</div>
+          <div class="avatar-sm" style="background:linear-gradient(135deg,#0ea5e9,#2dd4bf)">R</div>
+          <div class="avatar-sm" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">S</div>
+          <div class="avatar-sm" style="background:linear-gradient(135deg,#22c55e,#0ea5e9)">P</div>
+          <div class="avatar-sm" style="background:linear-gradient(135deg,#f43f5e,#8b5cf6)">M</div>
+        </div>
+        <div>
+          <div class="stars">★★★★★</div>
+          <div class="proof-text">Loved by <strong>42,000+</strong> learners across India</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat"><div class="stat-num c-purple">42k+</div><div class="stat-label">Students</div></div>
+      <div class="stat"><div class="stat-num c-teal">18</div><div class="stat-label">Expert Courses</div></div>
+      <div class="stat"><div class="stat-num c-gold">4.9★</div><div class="stat-label">Avg Rating</div></div>
+      <div class="stat"><div class="stat-num c-rose">96%</div><div class="stat-label">Completion Rate</div></div>
+    </div>
+  </div>
+
+  <!-- COURSES -->
+  <div id="courses-section">
+    <div class="section">
+      <div class="section-head">
+        <div class="section-label">Curriculum</div>
+        <h2 class="section-title">Everything you need to build with AI</h2>
+        <p class="section-desc">From prompt engineering to deploying fine-tuned models in production — we cover it all.</p>
+      </div>
+      <div class="courses-grid" id="coursesGrid"></div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="features-bg" id="about-section">
+    <div class="section">
+      <div class="section-head" style="text-align:center;max-width:600px;margin:0 auto 3.5rem">
+        <div class="section-label">Why GenAI Academy</div>
+        <h2 class="section-title">Built for builders, by builders</h2>
+        <p class="section-desc" style="max-width:100%">Our instructors have shipped AI products at OpenAI, Google DeepMind, and top Indian startups. Every lesson is grounded in real-world experience.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feat-card">
+          <div class="feat-icon" style="background:rgba(108,99,255,.12)">🧠</div>
+          <div class="feat-title">Expert-crafted content</div>
+          <div class="feat-desc">Curriculum designed by ML engineers who have built real AI systems at scale.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon" style="background:rgba(45,212,191,.1)">⚡</div>
+          <div class="feat-title">Project-first learning</div>
+          <div class="feat-desc">Build real apps every week — not just watch videos. Your portfolio grows as you learn.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon" style="background:rgba(245,158,11,.1)">🎯</div>
+          <div class="feat-title">Job-ready outcomes</div>
+          <div class="feat-desc">Certificates + LinkedIn badges that employers recognise. 94% of Pro graduates land AI roles.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon" style="background:rgba(244,63,94,.1)">🌐</div>
+          <div class="feat-title">Thriving community</div>
+          <div class="feat-desc">40k+ peers, weekly live sessions, Discord channels, and alumni hiring network.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICING -->
+  <div id="pricing-section" class="pricing-wrap">
+    <div class="section" style="text-align:center;max-width:1100px">
+      <div class="section-head" style="margin-bottom:3.5rem">
+        <div class="section-label">Pricing</div>
+        <h2 class="section-title">Simple, honest pricing</h2>
+        <p class="section-desc" style="max-width:100%;margin:0 auto">No hidden fees. Start free, upgrade when ready. Cancel anytime.</p>
+      </div>
+      <div class="pricing-grid" id="pricingGrid"></div>
+    </div>
+  </div>
+
+  <!-- TESTIMONIALS -->
+  <div class="testimonials-wrap">
+    <div class="section">
+      <div class="section-head" style="text-align:center;max-width:600px;margin:0 auto 3rem">
+        <div class="section-label">Stories</div>
+        <h2 class="section-title">Students who made the leap</h2>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <div class="testi-text">"Went from knowing nothing about LLMs to building a full RAG-powered product in 8 weeks. The course structure is incredibly well thought out."</div>
+          <div class="testi-author"><div class="testi-avatar" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">AR</div><div><div class="testi-name">Aarav Rathi</div><div class="testi-role">ML Engineer · Bangalore</div></div></div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <div class="testi-text">"The Lifetime plan is genuinely the best investment I've made in my career. The live mentorship sessions alone are worth ten times the price."</div>
+          <div class="testi-author"><div class="testi-avatar" style="background:linear-gradient(135deg,#0ea5e9,#2dd4bf)">PS</div><div><div class="testi-name">Priya Singh</div><div class="testi-role">Product Manager · Mumbai</div></div></div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <div class="testi-text">"I tried 4 other AI courses before this one. GenAI Academy is the only one that actually explains how things work under the hood, not just the API calls."</div>
+          <div class="testi-author"><div class="testi-avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">RK</div><div><div class="testi-name">Rohan Kumar</div><div class="testi-role">Data Scientist · Delhi</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">GenAI Academy</div>
+    <div class="footer-links">
+      <span class="footer-link" onclick="scrollToId('courses-section')">Courses</span>
+      <span class="footer-link" onclick="scrollToId('pricing-section')">Pricing</span>
+      <span class="footer-link" onclick="scrollToId('about-section')">About</span>
+      <span class="footer-link">Blog</span>
+      <span class="footer-link">Careers</span>
+      <span class="footer-link">Terms</span>
+      <span class="footer-link">Privacy</span>
+    </div>
+    <div class="footer-copy">© 2025 GenAI Academy Pvt. Ltd. All rights reserved.</div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════════
+     DASHBOARD VIEW
+═══════════════════════════════════ -->
+<div id="dashView" class="view">
+  <div class="dash-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-user">
+        <div class="user-avatar" id="dashAvatar">U</div>
+        <div class="user-name" id="dashName">User</div>
+        <div class="user-email" id="dashEmail">user@email.com</div>
+        <div class="user-plan-badge plan-free" id="dashPlanBadge">Free</div>
+      </div>
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-item active" onclick="showDashTab('overview',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+          Overview
+        </li>
+        <li class="sidebar-nav-item" onclick="showDashTab('courses',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+          My Courses
+        </li>
+        <li class="sidebar-nav-item" onclick="showDashTab('billing',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Billing
+        </li>
+        <li class="sidebar-nav-item" onclick="showDashTab('profile',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profile
+        </li>
+        <li class="sidebar-nav-item" onclick="goLanding();scrollToId('courses-section')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Browse Courses
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <button class="btn btn-ghost btn-sm btn-full" onclick="doLogout()" style="justify-content:center;color:var(--muted)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign out
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="dash-main">
+      <!-- Overview -->
+      <div class="dash-section active" id="ds-overview">
+        <div class="dash-section-title" id="overviewGreeting">Welcome back 👋</div>
+        <div class="dash-section-sub">Here's your learning progress at a glance.</div>
+        <div class="metrics-row">
+          <div class="metric-card"><div class="metric-label">Enrolled Courses</div><div class="metric-val mv-purple" id="metEnrolled">0</div></div>
+          <div class="metric-card"><div class="metric-label">Hours Learned</div><div class="metric-val mv-teal" id="metHours">0</div></div>
+          <div class="metric-card"><div class="metric-label">Certificates</div><div class="metric-val mv-gold" id="metCerts">0</div></div>
+        </div>
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:1rem">Continue learning</h3>
+        <div class="enrolled-grid" id="overviewEnrolled"></div>
+      </div>
+
+      <!-- My Courses -->
+      <div class="dash-section" id="ds-courses">
+        <div class="dash-section-title">My Courses</div>
+        <div class="dash-section-sub">All courses you're enrolled in.</div>
+        <div class="enrolled-grid" id="myCoursesGrid"></div>
+        <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+          <p class="text-muted text-sm mb-4">Want to learn more?</p>
+          <button class="btn btn-outline" onclick="goLanding();scrollToId('courses-section')">Browse all courses →</button>
+        </div>
+      </div>
+
+      <!-- Billing -->
+      <div class="dash-section" id="ds-billing">
+        <div class="dash-section-title">Billing & Subscription</div>
+        <div class="dash-section-sub">Manage your plan and payment history.</div>
+        <div id="billingContent"></div>
+      </div>
+
+      <!-- Profile -->
+      <div class="dash-section" id="ds-profile">
+        <div class="dash-section-title">Profile Settings</div>
+        <div class="dash-section-sub">Update your personal information and preferences.</div>
+        <div class="avatar-upload">
+          <div class="user-avatar" id="profileAvatar" style="width:64px;height:64px;font-size:1.5rem">U</div>
+          <div>
+            <div class="user-name" id="profileAvatarName">User</div>
+            <button class="avatar-upload-btn mt-2" onclick="toast('Photo upload coming soon!','info')">Change photo</button>
+          </div>
+        </div>
+        <div class="profile-grid">
+          <div class="form-group"><label class="form-label">First name</label><input class="form-input" id="profileFirst"/></div>
+          <div class="form-group"><label class="form-label">Last name</label><input class="form-input" id="profileLast"/></div>
+          <div class="form-group full"><label class="form-label">Email address</label><input class="form-input" id="profileEmail" type="email"/></div>
+          <div class="form-group full"><label class="form-label">Bio</label><textarea class="form-input" id="profileBio" rows="3" placeholder="Tell us a bit about yourself…" style="resize:vertical"></textarea></div>
+          <div class="form-group"><label class="form-label">LinkedIn URL</label><input class="form-input" placeholder="https://linkedin.com/in/…"/></div>
+          <div class="form-group"><label class="form-label">Location</label><input class="form-input" placeholder="Bangalore, India"/></div>
+        </div>
+        <button class="btn btn-primary mt-4" onclick="saveProfile()">Save changes</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     COURSE PLAYER VIEW
+═══════════════════════════════════ -->
+<div id="playerView" class="view">
+  <div class="player-layout">
+    <!-- Sidebar -->
+    <aside class="player-sidebar">
+      <div class="player-sidebar-header">
+        <button class="btn btn-ghost btn-sm" onclick="showView('dash')" style="margin-bottom:.5rem;padding:.35rem .6rem">← Back to dashboard</button>
+        <div class="player-course-title" id="playerCourseTitle">Course Title</div>
+        <div class="player-progress-wrap">
+          <div class="player-progress-label"><span>Progress</span><span id="playerProgressPct">0%</span></div>
+          <div class="progress-bar"><div class="progress-fill" id="playerProgressBar" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div id="playerModules"></div>
+    </aside>
+
+    <!-- Main -->
+    <div class="player-main">
+      <div class="video-area">
+        <div class="video-placeholder">
+          <span class="video-placeholder-icon">🎬</span>
+          <div style="font-size:1.1rem;font-weight:600;margin-bottom:.5rem" id="videoTitle">Select a lesson to begin</div>
+          <div style="font-size:.875rem;color:var(--muted)">HD video with closed captions</div>
+          <div class="play-btn" id="playBtn" onclick="togglePlay()">▶</div>
+        </div>
+      </div>
+      <div class="player-content">
+        <div class="player-lesson-title" id="playerLessonTitle">Getting Started</div>
+        <div class="player-lesson-meta" id="playerLessonMeta">
+          <span>📖 12 min read</span><span>🎯 Beginner</span><span>💡 1 resource</span>
+        </div>
+        <div class="player-desc" id="playerLessonDesc">
+          Welcome to this lesson. Click a lesson in the sidebar to start learning. Each lesson includes a video, detailed notes, and downloadable resources to help you build real skills.
+        </div>
+        <div class="player-nav">
+          <button class="btn btn-outline btn-sm" id="prevBtn" onclick="prevLesson()">← Previous</button>
+          <button class="btn btn-primary btn-sm" id="nextBtn" onclick="nextLesson()">Next lesson →</button>
+          <button class="btn btn-teal btn-sm" onclick="markDone()">Mark complete ✓</button>
+        </div>
+        <div class="resource-chips">
+          <span class="resource-chip" onclick="toast('Downloading slides…','info')">📄 Lesson slides</span>
+          <span class="resource-chip" onclick="toast('Notebook opening…','info')">📓 Colab notebook</span>
+          <span class="resource-chip" onclick="toast('Opening repo…','info')">💻 GitHub repo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     AUTH MODAL
+═══════════════════════════════════ -->
+<div class="modal-overlay" id="authOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeOverlay('authOverlay')">✕</button>
+    <div class="modal-title" id="authModalTitle">Welcome back</div>
+    <div class="modal-sub" id="authModalSub">Sign in to continue your AI journey</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Sign in</button>
+      <button class="auth-tab" id="tabSignup" onclick="switchAuthTab('signup')">Create account</button>
+    </div>
+    <!-- Login form -->
+    <div id="loginForm">
+      <div class="form-group">
+        <label class="form-label">Email address</label>
+        <input class="form-input" id="loginEmail" type="email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="loginPass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+        <div class="form-err" id="loginErr"></div>
+      </div>
+      <button class="btn btn-primary btn-full" id="loginBtn" onclick="doLogin()">Sign in</button>
+      <p class="form-hint mt-2"><a onclick="toast('Password reset email sent (demo)','info')">Forgot password?</a></p>
+    </div>
+    <!-- Signup form -->
+    <div id="signupForm" class="hidden">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">First name</label><input class="form-input" id="signupFirst" placeholder="Aarav"/></div>
+        <div class="form-group"><label class="form-label">Last name</label><input class="form-input" id="signupLast" placeholder="Sharma"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Email address</label><input class="form-input" id="signupEmail" type="email" placeholder="you@example.com"/></div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="signupPass" type="password" placeholder="Minimum 8 characters"/>
+        <div class="form-err" id="signupErr"></div>
+      </div>
+      <button class="btn btn-primary btn-full" id="signupBtn" onclick="doSignup()">Create account</button>
+      <p class="form-hint mt-2" style="font-size:.75rem">By signing up you agree to our <a>Terms of Service</a> and <a>Privacy Policy</a></p>
+    </div>
+    <div class="divider">or continue with</div>
+    <button class="social-btn" onclick="doSocialLogin('Google')">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      Continue with Google
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     PAYMENT MODAL
+═══════════════════════════════════ -->
+<div class="modal-overlay payment-modal" id="payOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeOverlay('payOverlay')">✕</button>
+    <!-- Payment form -->
+    <div id="payForm">
+      <div class="modal-title">Complete your purchase</div>
+      <div class="modal-sub">You're one step away from unlocking everything.</div>
+      <div class="pay-order" id="payOrderSummary"></div>
+      <div class="form-group">
+        <label class="form-label">Card number</label>
+        <div class="card-wrap">
+          <input class="form-input" id="cardNum" placeholder="1234 5678 9012 3456" maxlength="19" oninput="fmtCard(this)"/>
+          <div class="card-brands"><div class="card-brand cb-visa">VISA</div><div class="card-brand cb-mc">MC</div><div class="card-brand cb-rupay">RuPay</div></div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Expiry</label><input class="form-input" placeholder="MM / YY" maxlength="7" oninput="fmtExpiry(this)"/></div>
+        <div class="form-group"><label class="form-label">CVV</label><input class="form-input" type="password" placeholder="•••" maxlength="4"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Name on card</label><input class="form-input" placeholder="As it appears on the card"/></div>
+      <div class="form-err mb-4" id="payErr"></div>
+      <button class="btn btn-teal btn-full btn-lg" id="payBtn" onclick="doPayment()">Pay & activate plan</button>
+      <div class="secure-note"><div class="lock-badge">🔒</div>256-bit SSL encrypted · We never store your card details · Powered by Razorpay</div>
+    </div>
+    <!-- Payment success screen -->
+    <div id="paySuccess" class="pay-success hidden">
+      <div class="pay-success-icon">🎉</div>
+      <div class="pay-success-title">Payment successful!</div>
+      <div class="pay-success-desc" id="paySuccessDesc">Your plan is now active. Welcome to the next level.</div>
+      <button class="btn btn-primary btn-full" onclick="closeOverlay('payOverlay');showView('dash');showDashTab('overview',null)">Go to dashboard →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── APP SCRIPT ─── -->
+<script>
+// ─── DATA ───
+const COURSES = [
+  {id:1,emoji:'🤖',thumb:'ct-1',title:'Prompt Engineering Mastery',desc:'Master the art of writing powerful, reliable prompts for ChatGPT, Claude, and Gemini. Build production-grade AI pipelines without any code.',level:'Beginner',lessons:24,hours:'8h',price:'Free',isFree:true,modules:[{title:'Foundations',lessons:[{title:'What is a prompt?',dur:'8 min'},{title:'Anatomy of great prompts',dur:'12 min'},{title:'System vs user messages',dur:'10 min'}]},{title:'Advanced Patterns',lessons:[{title:'Chain-of-thought prompting',dur:'15 min'},{title:'Few-shot examples',dur:'11 min'},{title:'Output formatting',dur:'9 min'}]},{title:'Real-world Pipelines',lessons:[{title:'Building a classifier',dur:'18 min'},{title:'Summarisation at scale',dur:'14 min'},{title:'Evaluation and iteration',dur:'16 min'}]}]},
+  {id:2,emoji:'🧠',thumb:'ct-2',title:'LLMs: How They Actually Work',desc:'Deep dive into transformers, attention mechanisms, tokenisation, and the science behind modern large language models. No jargon, real intuition.',level:'Intermediate',lessons:36,hours:'14h',price:'₹1,999',isFree:false,modules:[{title:'The Transformer Architecture',lessons:[{title:'Attention mechanisms explained',dur:'20 min'},{title:'Positional encoding',dur:'14 min'},{title:'Feed-forward layers',dur:'12 min'}]},{title:'Training & Alignment',lessons:[{title:'Pre-training on the web',dur:'18 min'},{title:'RLHF and instruction tuning',dur:'22 min'},{title:'Constitutional AI',dur:'15 min'}]}]},
+  {id:3,emoji:'🔧',thumb:'ct-3',title:'Build AI Apps with LangChain',desc:'Create RAG pipelines, autonomous agents, and multi-step workflows. Deploy production-ready AI applications from scratch.',level:'Intermediate',lessons:42,hours:'18h',price:'₹2,499',isFree:false,modules:[{title:'LangChain Basics',lessons:[{title:'Chains and runnables',dur:'16 min'},{title:'Memory and state',dur:'14 min'}]},{title:'RAG Systems',lessons:[{title:'Vector databases deep dive',dur:'20 min'},{title:'Hybrid search strategies',dur:'18 min'},{title:'Evaluation and evals',dur:'15 min'}]}]},
+  {id:4,emoji:'🎨',thumb:'ct-4',title:'Generative Image AI',desc:'Master Stable Diffusion, ControlNet, and LoRA fine-tuning. Learn to use image generation APIs in real products.',level:'Beginner',lessons:28,hours:'10h',price:'₹1,499',isFree:false,modules:[{title:'Diffusion Models 101',lessons:[{title:'How diffusion works',dur:'12 min'},{title:'Stable Diffusion tour',dur:'16 min'}]},{title:'Advanced Control',lessons:[{title:'ControlNet in practice',dur:'18 min'},{title:'LoRA fine-tuning',dur:'22 min'}]}]},
+  {id:5,emoji:'📊',thumb:'ct-5',title:'AI for Data Scientists',desc:'Integrate LLMs into your ML workflows. Automated feature engineering, code generation, text-to-SQL, and more.',level:'Advanced',lessons:50,hours:'22h',price:'₹3,499',isFree:false,modules:[{title:'LLMs in the ML Stack',lessons:[{title:'Text-to-SQL pipelines',dur:'18 min'},{title:'Auto feature engineering',dur:'16 min'},{title:'Model cards with LLMs',dur:'12 min'}]},{title:'Production Patterns',lessons:[{title:'Monitoring LLM outputs',dur:'14 min'},{title:'Cost optimisation at scale',dur:'20 min'}]}]},
+  {id:6,emoji:'🚀',thumb:'ct-6',title:'Fine-tuning Foundation Models',desc:'Fine-tune GPT, LLaMA, and Mistral on custom datasets. Quantization, LoRA, and deploying to production at scale.',level:'Advanced',lessons:38,hours:'16h',price:'₹2,999',isFree:false,modules:[{title:'Setup & Theory',lessons:[{title:'When to fine-tune vs RAG',dur:'14 min'},{title:'Dataset preparation',dur:'18 min'}]},{title:'Training',lessons:[{title:'LoRA and QLoRA hands-on',dur:'24 min'},{title:'Evaluating your fine-tune',dur:'16 min'},{title:'Deploying with vLLM',dur:'20 min'}]}]},
+];
+
+const PLANS = [
+  {id:'free',name:'Starter',price:'₹0',period:'forever',desc:'Great for exploring AI basics at your own pace.',features:[{ok:true,text:'3 free courses'},{ok:true,text:'Community forum access'},{ok:true,text:'Course completion certificates'},{ok:false,text:'Live mentorship sessions'},{ok:false,text:'Project reviews'},{ok:false,text:'Career coaching'}],cta:'Get started free',popular:false},
+  {id:'pro',name:'Pro',price:'₹999',period:'/ month',desc:'For serious learners ready to build real AI projects.',features:[{ok:true,text:'All 18 courses'},{ok:true,text:'Weekly live sessions'},{ok:true,text:'Project reviews & feedback'},{ok:true,text:'Career coaching'},{ok:true,text:'Private Discord'},{ok:true,text:'Certificates + LinkedIn badge'}],cta:'Get Pro',popular:true},
+  {id:'lifetime',name:'Lifetime',price:'₹7,999',period:'one-time',desc:'Pay once, learn forever. Includes every future course.',features:[{ok:true,text:'Everything in Pro'},{ok:true,text:'All future courses included'},{ok:true,text:'Priority support'},{ok:true,text:'Early access to new content'},{ok:true,text:'1-on-1 onboarding call'},{ok:true,text:'Alumni hiring network'}],cta:'Buy Lifetime',popular:false},
+];
+
+// ─── APP STATE ───
+let state = {
+  user: null,
+  users: {
+    'demo@genai.com': {pw:'demo1234',name:'Demo User',plan:'pro',enrolled:[1,2],certs:1,hours:14.5}
+  },
+  pendingPlan: null,
+  currentCourse: null,
+  currentLesson: {module:0,lesson:0},
+  lessonDone: {},
+  playing: false,
+};
+
+// ─── INIT ───
+(function init(){
+  renderCourses();
+  renderPricing();
+  const saved = sessionStorage.getItem('_gai_user');
+  if(saved){ state.user = JSON.parse(saved); enterDash(); }
+})();
+
+// ─── RENDER ───
+function renderCourses(){
+  const g = document.getElementById('coursesGrid');
+  g.innerHTML = COURSES.map(c=>`
+    <div class="course-card" onclick="buyCourse(${c.id})">
+      <div class="course-thumb ${c.thumb}">
+        <span>${c.emoji}</span>
+        <span class="course-badge ${c.isFree?'badge-free':'badge-'+c.level.toLowerCase()}">${c.isFree?'FREE':c.level}</span>
+      </div>
+      <div class="course-body">
+        <div class="course-title">${c.title}</div>
+        <div class="course-desc">${c.desc}</div>
+        <div class="course-footer">
+          <div class="course-meta-info">${c.lessons} lessons · ${c.hours}</div>
+          <div class="course-price ${c.isFree?'is-free':''}">${c.price}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderPricing(){
+  const g = document.getElementById('pricingGrid');
+  g.innerHTML = PLANS.map(p=>`
+    <div class="plan-card${p.popular?' popular':''}">
+      ${p.popular?'<div class="plan-pop-badge">MOST POPULAR</div>':''}
+      <div class="plan-name">${p.name}</div>
+      <div class="plan-price-val">${p.price}</div>
+      <div class="plan-price-period">${p.period}</div>
+      <div class="plan-desc">${p.desc}</div>
+      <ul class="plan-features">${p.features.map(f=>`
+        <li class="${f.ok?'yes':''}">
+          <span class="check-icon ${f.ok?'ok':'no'}">${f.ok?'✓':'✗'}</span>${f.text}
+        </li>`).join('')}</ul>
+      <button class="btn ${p.popular?'btn-primary':'btn-outline'} btn-full" onclick="handlePlanCta('${p.id}','${p.name}','${p.price}','${p.period}')">${p.cta}</button>
+    </div>`).join('');
+}
+
+function renderEnrolledCards(containerId){
+  const el = document.getElementById(containerId);
+  if(!state.user){ el.innerHTML=''; return; }
+  const enrolled = state.user.enrolled.map(id=>COURSES.find(c=>c.id===id)).filter(Boolean);
+  if(!enrolled.length){ el.innerHTML='<p class="text-muted text-sm">No courses yet. <a style="color:var(--accent);cursor:pointer" onclick="goLanding();scrollToId(\'courses-section\')">Browse courses →</a></p>'; return; }
+  el.innerHTML = enrolled.map((c,i)=>{
+    const prog = i===0?68:23;
+    return `<div class="enrolled-card" onclick="openPlayer(${c.id})">
+      <div class="enrolled-thumb ${c.thumb}">${c.emoji}</div>
+      <div class="enrolled-title">${c.title}</div>
+      <div class="enrolled-meta">${c.lessons} lessons · ${c.hours} · ${c.level}</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${prog}%"></div></div>
+      <div class="progress-label">${prog}% complete</div>
+    </div>`;
+  }).join('');
+}
+
+function renderBilling(){
+  const u = state.user;
+  const isPaid = u.plan !== 'free';
+  const planLabel = u.plan==='pro'?'Pro Monthly':u.plan==='lifetime'?'Lifetime':'Starter (Free)';
+  document.getElementById('billingContent').innerHTML = `
+    <div class="billing-card">
+      <div class="billing-plan-row">
+        <div><div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem">Current plan</div>
+        <div class="billing-plan-name">${planLabel}</div></div>
+        <div class="user-plan-badge ${planBadgeClass(u.plan)}">${u.plan==='pro'?'Active':u.plan==='lifetime'?'Lifetime':'Free'}</div>
+      </div>
+      <div class="billing-info">${isPaid?`Next billing date: <strong>June 1, 2025</strong> · <strong>${u.plan==='pro'?'₹999':'₹7,999'}</strong>`:'You\'re on the free plan. Upgrade to unlock all 18 courses.'}</div>
+    </div>
+    ${!isPaid?`<button class="btn btn-primary" onclick="handlePlanCta('pro','Pro','₹999','/ month')">Upgrade to Pro →</button>`:''}
+    ${u.plan==='pro'?`<div style="margin-top:1.5rem"><h3 style="font-size:.9rem;font-weight:700;margin-bottom:1rem">Payment history</h3>
+      <div class="invoice-row"><span>May 1, 2025</span><span>Pro Monthly</span><span>₹999</span><span class="invoice-status status-paid">PAID</span></div>
+      <div class="invoice-row"><span>Apr 1, 2025</span><span>Pro Monthly</span><span>₹999</span><span class="invoice-status status-paid">PAID</span></div>
+    </div><div style="margin-top:1.5rem"><button class="btn btn-danger btn-sm" onclick="toast('Cancellation flow would appear here.','info')">Cancel subscription</button></div>`:''}`;
+}
+
+// ─── VIEWS ───
+function showView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(name+'View').classList.add('active');
+  window.scrollTo(0,0);
+}
+function goLanding(){ showView('landing'); updateNav(false); }
+
+function updateNav(loggedIn){
+  const nr = document.getElementById('navRight');
+  const nc = document.getElementById('navCenter');
+  if(loggedIn){
+    nc.innerHTML = '';
+    nr.innerHTML = `<span style="font-size:.875rem;color:var(--muted)">Hi, ${state.user.name.split(' ')[0]}</span>
+      <button class="btn btn-ghost btn-sm" onclick="showView('dash')">Dashboard</button>
+      <button class="btn btn-outline btn-sm" onclick="doLogout()">Sign out</button>`;
+  } else {
+    nc.innerHTML = `<span class="nav-link" onclick="scrollToId('courses-section')">Courses</span>
+      <span class="nav-link" onclick="scrollToId('pricing-section')">Pricing</span>
+      <span class="nav-link" onclick="scrollToId('about-section')">About</span>`;
+    nr.innerHTML = `<button class="btn btn-ghost btn-sm" onclick="openAuth('login')">Sign in</button>
+      <button class="btn btn-primary btn-sm" onclick="openAuth('signup')">Get started free</button>`;
+  }
+}
+
+function scrollToId(id){ document.getElementById(id)?.scrollIntoView({behavior:'smooth'}); }
+
+// ─── DASHBOARD ───
+function enterDash(){
+  const u = state.user;
+  const initials = u.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('dashAvatar').textContent = initials;
+  document.getElementById('dashName').textContent = u.name;
+  document.getElementById('dashEmail').textContent = u.email;
+  const pb = document.getElementById('dashPlanBadge');
+  pb.textContent = u.plan==='pro'?'Pro Plan':u.plan==='lifetime'?'Lifetime':'Free';
+  pb.className = 'user-plan-badge '+planBadgeClass(u.plan);
+  document.getElementById('metEnrolled').textContent = u.enrolled.length;
+  document.getElementById('metHours').textContent = u.hours;
+  document.getElementById('metCerts').textContent = u.certs;
+  document.getElementById('overviewGreeting').textContent = 'Welcome back, '+u.name.split(' ')[0]+' 👋';
+  // profile
+  const [pf,pl] = u.name.split(' ');
+  document.getElementById('profileFirst').value = pf||'';
+  document.getElementById('profileLast').value = pl||'';
+  document.getElementById('profileEmail').value = u.email;
+  document.getElementById('profileAvatar').textContent = initials;
+  document.getElementById('profileAvatarName').textContent = u.name;
+  renderEnrolledCards('overviewEnrolled');
+  renderEnrolledCards('myCoursesGrid');
+  renderBilling();
+  updateNav(true);
+  showView('dash');
+}
+
+function showDashTab(name, el){
+  document.querySelectorAll('.dash-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('ds-'+name).classList.add('active');
+  document.querySelectorAll('.sidebar-nav-item').forEach(i=>i.classList.remove('active'));
+  if(el) el.classList.add('active');
+}
+
+function saveProfile(){
+  const fn = document.getElementById('profileFirst').value.trim();
+  const ln = document.getElementById('profileLast').value.trim();
+  if(!fn){ toast('First name is required','error'); return; }
+  state.user.name = (fn+' '+ln).trim();
+  state.user.email = document.getElementById('profileEmail').value.trim();
+  sessionStorage.setItem('_gai_user',JSON.stringify(state.user));
+  enterDash();
+  toast('Profile saved successfully ✓','success');
+}
+
+function doLogout(){
+  state.user = null;
+  sessionStorage.removeItem('_gai_user');
+  updateNav(false);
+  showView('landing');
+  toast('Signed out. See you soon!','info');
+}
+
+function planBadgeClass(plan){
+  if(plan==='pro') return 'plan-pro';
+  if(plan==='lifetime') return 'plan-lifetime';
+  return 'plan-free';
+}
+
+// ─── AUTH ───
+function openAuth(tab){
+  document.getElementById('authOverlay').classList.add('open');
+  switchAuthTab(tab);
+}
+function closeOverlay(id){ document.getElementById(id).classList.remove('open'); }
+
+function switchAuthTab(tab){
+  const isLogin = tab==='login';
+  document.getElementById('loginForm').classList.toggle('hidden',!isLogin);
+  document.getElementById('signupForm').classList.toggle('hidden',isLogin);
+  document.getElementById('tabLogin').classList.toggle('active',isLogin);
+  document.getElementById('tabSignup').classList.toggle('active',!isLogin);
+  document.getElementById('authModalTitle').textContent = isLogin?'Welcome back':'Create your account';
+  document.getElementById('authModalSub').textContent = isLogin?'Sign in to continue your AI journey':'Join 42,000+ AI learners today';
+  document.getElementById('loginErr').textContent='';
+  document.getElementById('signupErr').textContent='';
+}
+
+function doLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  document.getElementById('loginErr').textContent='';
+  if(!email||!pass){ document.getElementById('loginErr').textContent='Please fill in all fields.'; return; }
+  setBtnLoading('loginBtn',true);
+  setTimeout(()=>{
+    setBtnLoading('loginBtn',false,'Sign in');
+    const u = state.users[email];
+    if(u && u.pw===pass){
+      state.user = {email,name:u.name,plan:u.plan,enrolled:[...u.enrolled],certs:u.certs,hours:u.hours};
+      sessionStorage.setItem('_gai_user',JSON.stringify(state.user));
+      closeOverlay('authOverlay');
+      enterDash();
+      toast('Welcome back, '+u.name.split(' ')[0]+'! 👋','success');
+    } else {
+      document.getElementById('loginErr').textContent = 'Invalid credentials. Try demo@genai.com / demo1234';
+    }
+  },1000);
+}
+
+function doSignup(){
+  const fn = document.getElementById('signupFirst').value.trim();
+  const ln = document.getElementById('signupLast').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const pass = document.getElementById('signupPass').value;
+  document.getElementById('signupErr').textContent='';
+  if(!fn||!email||!pass){ document.getElementById('signupErr').textContent='Please fill in all required fields.'; return; }
+  if(pass.length<8){ document.getElementById('signupErr').textContent='Password must be at least 8 characters.'; return; }
+  if(state.users[email]){ document.getElementById('signupErr').textContent='An account with this email already exists.'; return; }
+  setBtnLoading('signupBtn',true);
+  setTimeout(()=>{
+    setBtnLoading('signupBtn',false,'Create account');
+    const name = (fn+' '+ln).trim();
+    state.users[email] = {pw:pass,name,plan:'free',enrolled:[1],certs:0,hours:0};
+    state.user = {email,name,plan:'free',enrolled:[1],certs:0,hours:0};
+    sessionStorage.setItem('_gai_user',JSON.stringify(state.user));
+    closeOverlay('authOverlay');
+    enterDash();
+    toast('Account created! Welcome to GenAI Academy 🎉','success');
+  },1200);
+}
+
+function doSocialLogin(provider){
+  setBtnLoading('loginBtn',true);
+  setTimeout(()=>{
+    setBtnLoading('loginBtn',false,'Sign in');
+    state.user = {email:'demo@genai.com',name:'Demo User',plan:'pro',enrolled:[1,2],certs:1,hours:14.5};
+    sessionStorage.setItem('_gai_user',JSON.stringify(state.user));
+    closeOverlay('authOverlay');
+    enterDash();
+    toast('Signed in with '+provider+' ✓','success');
+  },900);
+}
+
+// ─── COURSE / PAYMENT ───
+function buyCourse(id){
+  const c = COURSES.find(x=>x.id===id);
+  if(!state.user){ openAuth('signup'); return; }
+  if(c.isFree || state.user.enrolled.includes(id)){
+    openPlayer(id); return;
+  }
+  openPayment({name:c.title,price:c.price,type:'course',courseId:id});
+}
+
+function handlePlanCta(planId, planName, price, period){
+  if(!state.user){ openAuth('signup'); return; }
+  if(planId==='free'){ enterDash(); return; }
+  openPayment({name:planName+' Plan',price:price,period,type:'plan',planId});
+}
+
+function openPayment({name,price,period,type,planId,courseId}){
+  state.pendingPlan = {name,price,period,type,planId,courseId};
+  const priceVal = price.replace(/[^0-9]/g,'');
+  const gst = Math.round(parseInt(priceVal||0)*0.18);
+  document.getElementById('payOrderSummary').innerHTML = `
+    <div class="pay-row"><span>${name}</span><span>${price}</span></div>
+    <div class="pay-row"><span>GST (18%)</span><span>₹${gst}</span></div>
+    <div class="pay-row total"><span>Total</span><span class="pay-total-val">${price==='₹0'?'Free':price.replace('/mo','')}</span></div>`;
+  document.getElementById('payForm').classList.remove('hidden');
+  document.getElementById('paySuccess').classList.add('hidden');
+  document.getElementById('payErr').textContent='';
+  document.getElementById('cardNum').value='';
+  document.getElementById('payBtn').innerHTML='Pay & activate plan';
+  document.getElementById('payBtn').disabled=false;
+  document.getElementById('payOverlay').classList.add('open');
+}
+
+function doPayment(){
+  const card = document.getElementById('cardNum').value.replace(/\s/g,'');
+  document.getElementById('payErr').textContent='';
+  if(card.length<16){ document.getElementById('payErr').textContent='Please enter a valid 16-digit card number.'; return; }
+  setBtnLoading('payBtn',true);
+  setTimeout(()=>{
+    // Apply plan/course
+    const p = state.pendingPlan;
+    if(p.type==='plan'){
+      state.user.plan = p.planId;
+      if(p.planId==='pro'||p.planId==='lifetime'){
+        state.user.enrolled = COURSES.map(c=>c.id);
+        state.user.certs = 3;
+        state.user.hours = 42;
+      }
+    } else if(p.type==='course'){
+      if(!state.user.enrolled.includes(p.courseId)) state.user.enrolled.push(p.courseId);
+    }
+    sessionStorage.setItem('_gai_user',JSON.stringify(state.user));
+    // Refresh dash data
+    const initials = state.user.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('metEnrolled').textContent = state.user.enrolled.length;
+    document.getElementById('dashPlanBadge').textContent = state.user.plan==='pro'?'Pro Plan':state.user.plan==='lifetime'?'Lifetime':'Free';
+    document.getElementById('dashPlanBadge').className = 'user-plan-badge '+planBadgeClass(state.user.plan);
+    renderEnrolledCards('overviewEnrolled');
+    renderEnrolledCards('myCoursesGrid');
+    renderBilling();
+    // Show success
+    document.getElementById('payBtn').innerHTML = 'Pay & activate plan';
+    document.getElementById('payBtn').disabled = false;
+    document.getElementById('payForm').classList.add('hidden');
+    document.getElementById('paySuccessDesc').textContent = p.type==='plan'?p.name+' is now active. All courses are unlocked.':'Course added to your dashboard!';
+    document.getElementById('paySuccess').classList.remove('hidden');
+    toast('🎉 '+p.name+' activated!','success');
+  },1800);
+}
+
+// ─── PLAYER ───
+function openPlayer(courseId){
+  const c = COURSES.find(x=>x.id===courseId);
+  if(!c) return;
+  state.currentCourse = c;
+  state.currentLesson = {module:0,lesson:0};
+  document.getElementById('playerCourseTitle').textContent = c.title;
+  renderPlayerModules(c);
+  setPlayerLesson(0,0);
+  updatePlayerProgress(c);
+  showView('player');
+}
+
+function renderPlayerModules(c){
+  const el = document.getElementById('playerModules');
+  el.innerHTML = c.modules.map((m,mi)=>`
+    <div class="module-block ${mi===0?'open':''}" id="mod-${mi}">
+      <div class="module-header" onclick="toggleModule(${mi})">
+        <div class="module-title">${m.title}</div>
+        <div style="display:flex;align-items:center;gap:.5rem"><span class="module-count">${m.lessons.length} lessons</span><span class="module-chevron">▼</span></div>
+      </div>
+      <div class="module-lessons">${m.lessons.map((l,li)=>`
+        <div class="lesson-item ${mi===0&&li===0?'active':''} ${state.lessonDone[mi+'-'+li]?'done':''}" id="lesson-${mi}-${li}" onclick="setPlayerLesson(${mi},${li})">
+          <span class="lesson-icon">${state.lessonDone[mi+'-'+li]?'✓':'▶'}</span>
+          <span>${l.title}</span>
+          <span class="lesson-duration">${l.dur}</span>
+        </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function toggleModule(mi){
+  const el = document.getElementById('mod-'+mi);
+  el.classList.toggle('open');
+}
+
+function setPlayerLesson(mi,li){
+  state.currentLesson = {module:mi,lesson:li};
+  const c = state.currentCourse;
+  const m = c.modules[mi];
+  const l = m.lessons[li];
+  document.querySelectorAll('.lesson-item').forEach(el=>el.classList.remove('active'));
+  const lEl = document.getElementById('lesson-'+mi+'-'+li);
+  if(lEl){ lEl.classList.add('active'); lEl.scrollIntoView({block:'nearest'}); }
+  document.getElementById('playerLessonTitle').textContent = l.title;
+  document.getElementById('playerLessonMeta').innerHTML = `<span>🎬 ${l.dur}</span><span>📖 Notes included</span><span>💡 Resources</span>`;
+  document.getElementById('playerLessonDesc').textContent = `This lesson covers "${l.title}" as part of the "${m.title}" module in ${c.title}. Watch the video, then practise with the included Colab notebook and exercises.`;
+  document.getElementById('videoTitle').textContent = l.title;
+  state.playing = false;
+  document.getElementById('playBtn').textContent='▶';
+}
+
+function prevLesson(){
+  const c = state.currentCourse;
+  let {module:mi,lesson:li} = state.currentLesson;
+  if(li>0){ setPlayerLesson(mi,li-1); }
+  else if(mi>0){ const pmi=mi-1; setPlayerLesson(pmi,c.modules[pmi].lessons.length-1); }
+  else toast('You\'re at the first lesson!','info');
+}
+
+function nextLesson(){
+  const c = state.currentCourse;
+  let {module:mi,lesson:li} = state.currentLesson;
+  markDone();
+  if(li<c.modules[mi].lessons.length-1){ setPlayerLesson(mi,li+1); }
+  else if(mi<c.modules.length-1){ const nmi=mi+1; document.getElementById('mod-'+nmi)?.classList.add('open'); setPlayerLesson(nmi,0); }
+  else toast('🎉 You\'ve finished this module! Well done.','success');
+}
+
+function markDone(){
+  const {module:mi,lesson:li} = state.currentLesson;
+  state.lessonDone[mi+'-'+li] = true;
+  const el = document.getElementById('lesson-'+mi+'-'+li);
+  if(el){ el.classList.add('done'); el.querySelector('.lesson-icon').textContent='✓'; }
+  updatePlayerProgress(state.currentCourse);
+  toast('Lesson marked complete ✓','success');
+}
+
+function updatePlayerProgress(c){
+  let total=0,done=0;
+  c.modules.forEach((m,mi)=>m.lessons.forEach((_,li)=>{ total++; if(state.lessonDone[mi+'-'+li]) done++; }));
+  const pct = total?Math.round(done/total*100):0;
+  document.getElementById('playerProgressPct').textContent = pct+'%';
+  document.getElementById('playerProgressBar').style.width = pct+'%';
+}
+
+function togglePlay(){
+  state.playing = !state.playing;
+  document.getElementById('playBtn').textContent = state.playing?'⏸':'▶';
+  toast(state.playing?'Video playing…':'Video paused','info');
+}
+
+// ─── HELPERS ───
+function setBtnLoading(id,on,text){
+  const b = document.getElementById(id);
+  b.disabled = on;
+  b.innerHTML = on?'<span class="spinner"></span>':(text||b.dataset.label||b.innerHTML);
+}
+
+function fmtCard(el){ let v=el.value.replace(/\D/g,'').slice(0,16); el.value=v.replace(/(.{4})/g,'$1 ').trim(); }
+function fmtExpiry(el){ let v=el.value.replace(/\D/g,'').slice(0,4); if(v.length>=2) v=v.slice(0,2)+' / '+v.slice(2); el.value=v; }
+
+let toastTimer = {};
+function toast(msg,type='info'){
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'toast toast-'+type;
+  t.textContent = msg;
+  c.appendChild(t);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('show')));
+  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),400); },3500);
+}
+
+// Close modal on bg click
+document.querySelectorAll('.modal-overlay').forEach(ov=>{
+  ov.addEventListener('click',e=>{ if(e.target===ov) ov.classList.remove('open'); });
+});
+</script>
+</body>
+</html>
